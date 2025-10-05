@@ -1,4 +1,4 @@
-name: CI with Caching
+name: CI Cache Example
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-with-cache:
+  cache-demo:
     runs-on: ubuntu-latest
 
     steps:
@@ -15,24 +15,26 @@ jobs:
 
       - name: Set up uv
         uses: astral-sh/setup-uv@v5
-      
+
       - name: Create virtual environment
         run: uv venv
 
-      - name: Cache uv dependencies
+      - name: Cache dependencies
         uses: actions/cache@v4
-        id: cache-uv
+        id: cache-step
         with:
           path: ~/.cache/uv
-          key: cache-7845754
+          key: cache-06e360c
 
       - name: Install dependencies
-        run: uv pip install -r requirements.txt
-
-      - name: prime-cache-7845754
         run: |
-          if [[ "${{ steps.cache-uv.outputs.cache-hit }}" == "true" ]]; then
-            echo "Cache hit! Dependencies were restored."
+          echo "fastapi" > requirements.txt
+          uv pip install -r requirements.txt
+
+      - name: prime-cache-06e360c
+        run: |
+          if [[ "${{ steps.cache-step.outputs.cache-hit }}" == "true" ]]; then
+            echo "Cache hit for cache-06e360c"
           else
-            echo "Cache miss. Dependencies were installed and cache will be saved."
+            echo "Cache miss for cache-06e360c"
           fi
